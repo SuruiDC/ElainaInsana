@@ -39,8 +39,8 @@
     "sax": "^1.2.4",
     "twisted": "^1.44.3",
     "weather-js": "^2.0.0",
-    "ytdl-core": "^4.10.0",
-    "ytpl": "^2.2.3",
-    "ytsr": "^3.6.0"
+    "ytdl-core": "https://github.com/matteopolak/node-ytdl-core#d6b56cd67aaa38c22966b98f7b36ad3db4c90192",
+    "ytpl": "^2.3.0",
+    "ytsr": "^3.8.0"
   }
 }

@@ -39,7 +39,7 @@ exports.extractFunctions = body => {
     const ndx = body.indexOf(functionStart);
     if (ndx < 0) return '';
     const subBody = body.slice(ndx + functionStart.length - 1);
-    return `var ${functionName}=${utils.cutAfterJSON(subBody)}`;
+    return `var ${functionName}=${utils.cutAfterJS(subBody)}`;
   };
   const extractDecipher = () => {
     const functionName = utils.between(body, `a.set("alr","yes");c&&(c=`, `(decodeURIC`);
@@ -48,20 +48,21 @@ exports.extractFunctions = body => {
       const ndx = body.indexOf(functionStart);
       if (ndx >= 0) {
         const subBody = body.slice(ndx + functionStart.length);
-        let functionBody = `var ${functionStart}${utils.cutAfterJSON(subBody)}`;
+        let functionBody = `var ${functionStart}${utils.cutAfterJS(subBody)}`;
         functionBody = `${extractManipulations(functionBody)};${functionBody};${functionName}(sig);`;
         functions.push(functionBody);
       }
     }
   };
   const extractNCode = () => {
-    const functionName = utils.between(body, `&&(b=a.get("n"))&&(b=`, `(b)`);
+    let functionName = utils.between(body, `&&(b=a.get("n"))&&(b=`, `(b)`);
+    if (functionName.includes('[')) functionName = utils.between(body, `${functionName.split('[')[0]}=[`, `]`);
     if (functionName && functionName.length) {
       const functionStart = `${functionName}=function(a)`;
       const ndx = body.indexOf(functionStart);
       if (ndx >= 0) {
         const subBody = body.slice(ndx + functionStart.length);
-        const functionBody = `var ${functionStart}${utils.cutAfterJSON(subBody)};${functionName}(ncode);`;
+        const functionBody = `var ${functionStart}${utils.cutAfterJS(subBody)};${functionName}(ncode);`;
         functions.push(functionBody);
       }
     }
@@ -111,7 +112,7 @@ exports.setDownloadURL = (format, decipherScript, nTransformScript) => {
 exports.decipherFormats = async(formats, html5player, options) => {
   let decipheredFormats = {};
   let functions = await exports.getFunctions(html5player, options);
-  const decipherScript = functions.length ? new vm.Script(functions[0]) : null;
+  const decipherScript = functions.length ? new vm.Script(`var MC={QO:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b%a.length]=c},"if":function(a){a.reverse()},pn:function(a,b){a.splice(0,b)}};${functions[0]}`) : null;
   const nTransformScript = functions.length > 1 ? new vm.Script(functions[1]) : null;
   formats.forEach(format => {
     exports.setDownloadURL(format, decipherScript, nTransformScript);
